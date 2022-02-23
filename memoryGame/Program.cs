@@ -146,9 +146,9 @@ namespace memoryGame
             if (size == 0)
             {
                 Console.Clear();
-                Console.WriteLine("\t   YOU WIN   \t");
-                Console.WriteLine("You matched all the pairs!");
-                Console.WriteLine("You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
+                Console.WriteLine("\t=========   YOU WIN   =========\t");
+                Console.WriteLine("\t You matched all the pairs!");
+                Console.WriteLine("\t You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
                 setChances(-1);
                 setRunning(false);
             }
@@ -158,8 +158,8 @@ namespace memoryGame
             if (chances == 0) 
             {
                 Console.Clear();
-                Console.WriteLine("\t   GAME OVER   \t");
-                Console.WriteLine("You have run out of chances!");
+                Console.WriteLine("\t=========   GAME OVER   =========\t");
+                Console.WriteLine("\t You have run out of chances!");
                 setRunning(false);
             }
         }
@@ -314,9 +314,9 @@ namespace memoryGame
             Console.WriteLine("\t Guess chances: " + getChances());
             Console.WriteLine();
 
-            Console.WriteLine("   1  2  3  4");
-            Console.WriteLine("A  {0}  {1}  {2}  {3}", hiddenWords[0], hiddenWords[1], hiddenWords[2], hiddenWords[3]);
-            Console.WriteLine("B  {0}  {1}  {2}  {3}", hiddenWords[4], hiddenWords[5], hiddenWords[6], hiddenWords[7]);
+            Console.WriteLine("\t   1  2  3  4");
+            Console.WriteLine("\tA  {0}  {1}  {2}  {3}", hiddenWords[0], hiddenWords[1], hiddenWords[2], hiddenWords[3]);
+            Console.WriteLine("\tB  {0}  {1}  {2}  {3}", hiddenWords[4], hiddenWords[5], hiddenWords[6], hiddenWords[7]);
 
             Console.WriteLine();
             Console.WriteLine("—-----------------------------------");
