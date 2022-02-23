@@ -80,6 +80,8 @@ namespace memoryGame
 
     public class MemoryGame {
         private int chances;
+        private int moves;
+        private double completionTime;
         private int size;
         private String difficulty;
         private string[] words = File.ReadAllLines(@"..\..\..\resources\Words.txt");
@@ -88,6 +90,12 @@ namespace memoryGame
 
         public int getChances() { return chances; }
         public void setChances(int chances) { this.chances = chances; }
+
+        public int getMoves() { return moves; }
+        public void setMoves(int moves) { this.moves = moves; }
+
+        public double getCompletionTime() { return completionTime; }
+        public void setCompletionTime(double completionTime) { this.completionTime = completionTime; }
 
         public int getSize() { return size; }
         public void setSize(int size) { this.size = size; }
@@ -140,6 +148,7 @@ namespace memoryGame
                 Console.Clear();
                 Console.WriteLine("\t   YOU WIN   \t");
                 Console.WriteLine("You matched all the pairs!");
+                Console.WriteLine("You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
                 setChances(-1);
                 setRunning(false);
             }
@@ -207,6 +216,8 @@ namespace memoryGame
         }
         public override void Run()
         {
+            DateTime t0 = DateTime.Now;
+
             setChances(10);
             setSize(4);
             setDifficulty("easy");
@@ -224,10 +235,12 @@ namespace memoryGame
                 hiddenWords[i] = hideSign.ToString();
             }
 
+            /*
             foreach (string word in gameWords)
             {
                 Console.WriteLine(word);
             }
+            */
             Console.WriteLine();
 
             while (getRunning())
@@ -252,6 +265,7 @@ namespace memoryGame
                                 checking = false;
                                 Console.ReadLine();
                                 setSize(getSize() - 1);
+                                setMoves(getMoves() + 1);
                             }
                             else
                             {
@@ -264,6 +278,7 @@ namespace memoryGame
                                 hiddenWords[previousPick] = hideSign.ToString();
                                 Console.ReadLine();
                                 setChances(getChances() - 1);
+                                setMoves(getMoves() + 1);
                             }
                         }
                         Console.Clear();
@@ -280,6 +295,9 @@ namespace memoryGame
                         Console.ReadLine();
                         Console.Clear();
                     }
+                    DateTime t1 = DateTime.Now;
+                    TimeSpan ts = (t1 - t0);
+                    setCompletionTime(ts.TotalSeconds);
                     checkWin();
 
                 }
@@ -357,9 +375,11 @@ namespace memoryGame
                 hiddenWords[i] = hideSign.ToString();
             }
 
+            /*
             foreach (string word in gameWords) { 
                 Console.WriteLine(word);
             }
+            */
             Console.WriteLine();
 
             while (getRunning()) {
