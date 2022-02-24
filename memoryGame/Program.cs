@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 
 namespace memoryGame
 {
@@ -175,6 +174,8 @@ namespace memoryGame
         }
         public void saveScore() 
         {
+            var dateTime = DateTime.Now;
+            var dateValue = dateTime.ToString("dd/MM/yyyy");
             Console.WriteLine(); 
             Console.WriteLine();
             Console.WriteLine("To save your score, enter your name: ");
@@ -183,7 +184,7 @@ namespace memoryGame
             String path = @"..\..\..\resources\Scoreboard.txt";
             using (StreamWriter sw = File.AppendText(path))
             {
-                sw.WriteLine(getUserName() + "|" + getMoves() + "|" + getCompletionTime());
+                sw.WriteLine(getUserName() + "|" + $"{dateValue}" + "|" + getMoves() + "|" + getCompletionTime());
                 
             }
         }
@@ -191,9 +192,17 @@ namespace memoryGame
             String path = @"..\..\..\resources\Scoreboard.txt";
             scoreboard = File.ReadAllLines(path);
             Console.WriteLine();
-            Console.WriteLine("=========   BEST SCORES   =========");
-            foreach (String line in scoreboard) { 
-                Console.WriteLine(line);
+            Console.WriteLine("\t=========   BEST SCORES   =========");
+
+            using (StreamReader sr = File.OpenText(path))
+            {
+                int counter = 0;
+                string s = "";
+                while ((s = sr.ReadLine()) != null && counter < 10)
+                {
+                    Console.WriteLine(s);
+                    counter++;
+                }
             }
             Console.WriteLine();
         }
@@ -384,12 +393,14 @@ namespace memoryGame
             else 
             {
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
+                secondPick = 0;
                 selectCoord();
             }
             return secondPick;
         }
         public override void Run() 
         {
+            DateTime t0 = DateTime.Now;
             setChances(15);
             setSize(8);
             setDifficulty("hard");
@@ -434,6 +445,7 @@ namespace memoryGame
                                 checking = false;
                                 Console.ReadLine();
                                 setSize(getSize() - 1);
+                                setMoves(getMoves() + 1);
                             }
                             else
                             {
@@ -446,6 +458,7 @@ namespace memoryGame
                                 hiddenWords[previousPick] = hideSign.ToString();
                                 Console.ReadLine();
                                 setChances(getChances() - 1);
+                                setMoves(getMoves() + 1);
                             }
                         }
                         Console.Clear();
@@ -462,6 +475,9 @@ namespace memoryGame
                         Console.ReadLine();
                         Console.Clear();
                     }
+                    DateTime t1 = DateTime.Now;
+                    TimeSpan ts = (t1 - t0);
+                    setCompletionTime(ts.TotalSeconds);
                     checkWin();
                     
                 }
