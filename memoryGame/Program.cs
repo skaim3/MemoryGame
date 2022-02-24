@@ -15,7 +15,7 @@ namespace memoryGame
     }
     public class Menu {
         private Boolean selectedDiff = false;
-        private String difficulty = "";
+        //private String difficulty = "";
 
         public Boolean getSelectedDiff() { return selectedDiff; }
         public void setSelectedDiff(Boolean selectedDiff) { this.selectedDiff = selectedDiff; }
@@ -88,7 +88,8 @@ namespace memoryGame
         private String difficulty;
         private String userName;
         private string[] words = File.ReadAllLines(@"..\..\..\resources\Words.txt");
-        public string[] gameWords = { " " };
+        public string[] scoreboard;
+        public string[] gameWords;
         private Boolean running = true;
 
         public int getChances() { return chances; }
@@ -156,6 +157,7 @@ namespace memoryGame
                 Console.WriteLine("    You matched all the pairs!");
                 Console.WriteLine("    You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
                 setChances(-1);
+                showScoreboard();
                 saveScore();
                 setRunning(false);
             }
@@ -167,6 +169,7 @@ namespace memoryGame
                 Console.Clear();
                 Console.WriteLine("\t=========   GAME OVER   =========\t");
                 Console.WriteLine("    You have run out of chances!");
+                showScoreboard();
                 setRunning(false);
             }
         }
@@ -183,6 +186,16 @@ namespace memoryGame
                 sw.WriteLine(getUserName() + "|" + getMoves() + "|" + getCompletionTime());
                 
             }
+        }
+        public void showScoreboard() {
+            String path = @"..\..\..\resources\Scoreboard.txt";
+            scoreboard = File.ReadAllLines(path);
+            Console.WriteLine();
+            Console.WriteLine("=========   BEST SCORES   =========");
+            foreach (String line in scoreboard) { 
+                Console.WriteLine(line);
+            }
+            Console.WriteLine();
         }
         public void checkForMatch() 
         { 
