@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace memoryGame
 {
@@ -30,6 +31,7 @@ namespace memoryGame
         }
         public void checkRestart() 
         {
+            Console.WriteLine();
             Console.WriteLine("Restart? (Y/N)");
             string selection = Console.ReadLine();
             selection = selection.ToLower();
@@ -84,6 +86,7 @@ namespace memoryGame
         private double completionTime;
         private int size;
         private String difficulty;
+        private String userName;
         private string[] words = File.ReadAllLines(@"..\..\..\resources\Words.txt");
         public string[] gameWords = { " " };
         private Boolean running = true;
@@ -102,6 +105,9 @@ namespace memoryGame
 
         public String getDifficulty() { return difficulty; }
         public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+
+        public String getUserName() { return userName; }
+        public void setUserName(String userName) { this.userName = userName; }
 
         public string[] getWords() { return words; }
         public void setWords(string[] words) { this.words = words; }
@@ -147,9 +153,10 @@ namespace memoryGame
             {
                 Console.Clear();
                 Console.WriteLine("\t=========   YOU WIN   =========\t");
-                Console.WriteLine("\t You matched all the pairs!");
-                Console.WriteLine("\t You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
+                Console.WriteLine("    You matched all the pairs!");
+                Console.WriteLine("    You solved the game after " + getMoves() + " moves. It took you " + getCompletionTime() + " seconds");
                 setChances(-1);
+                saveScore();
                 setRunning(false);
             }
         }
@@ -159,8 +166,22 @@ namespace memoryGame
             {
                 Console.Clear();
                 Console.WriteLine("\t=========   GAME OVER   =========\t");
-                Console.WriteLine("\t You have run out of chances!");
+                Console.WriteLine("    You have run out of chances!");
                 setRunning(false);
+            }
+        }
+        public void saveScore() 
+        {
+            Console.WriteLine(); 
+            Console.WriteLine();
+            Console.WriteLine("To save your score, enter your name: ");
+            string selectedString = Console.ReadLine();
+            setUserName(selectedString);
+            String path = @"..\..\..\resources\Scoreboard.txt";
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine(getUserName() + "|" + getMoves() + "|" + getCompletionTime());
+                
             }
         }
         public void checkForMatch() 
@@ -217,7 +238,6 @@ namespace memoryGame
         public override void Run()
         {
             DateTime t0 = DateTime.Now;
-
             setChances(10);
             setSize(4);
             setDifficulty("easy");
@@ -241,7 +261,7 @@ namespace memoryGame
                 Console.WriteLine(word);
             }
             */
-            Console.WriteLine();
+            //Console.WriteLine();
 
             while (getRunning())
             {
@@ -299,7 +319,6 @@ namespace memoryGame
                     TimeSpan ts = (t1 - t0);
                     setCompletionTime(ts.TotalSeconds);
                     checkWin();
-
                 }
                 checkLose();
 
@@ -380,7 +399,7 @@ namespace memoryGame
                 Console.WriteLine(word);
             }
             */
-            Console.WriteLine();
+            //Console.WriteLine();
 
             while (getRunning()) {
                 while (getChances() > 0)
