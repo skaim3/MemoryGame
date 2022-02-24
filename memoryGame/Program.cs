@@ -18,18 +18,20 @@ namespace memoryGame
     public class Menu {
         private Boolean selectedDiff = false;
         public Boolean keepPlaying { get; private set; } = true;
-        //private String difficulty = "";
+        //public String difficulty = "";
 
         public Boolean getSelectedDiff() { return selectedDiff; }
         public void setSelectedDiff(Boolean selectedDiff) { this.selectedDiff = selectedDiff; }
 
         public void Run() 
         {
+            var game = new MemoryGame();
             Console.WriteLine("Hello User! You are about to play a memory game\n");
             while (!selectedDiff)
             {
-                selectDifficulty();
+                selectDifficulty(game);
             }
+            game.Run();
         }
         public void checkRestart() 
         {
@@ -53,26 +55,31 @@ namespace memoryGame
                 checkRestart();
             }
         }
-        public void selectDifficulty() 
+        public void selectDifficulty(MemoryGame game) 
         {
             Console.WriteLine("Select the difficulty:");
             Console.WriteLine("1. Easy");
             Console.WriteLine("2. Hard");
-
+            
             String selection = Console.ReadLine();
             if (selection == "1")
             {
+                game.setChances(10);
+                game.setSize(4);
+                game.setDifficulty("easy");
+
+
                 setSelectedDiff(true);
                 Console.Clear();
-                MemoryGameEasy memoryGameEasy = new MemoryGameEasy();
-                memoryGameEasy.Run();
             }
             else if (selection == "2")
             {
+                game.setChances(15);
+                game.setSize(8);
+                game.setDifficulty("hard");
+
                 setSelectedDiff(true);
                 Console.Clear();
-                MemoryGameHard memoryGameHard = new MemoryGameHard();
-                memoryGameHard.Run();
             }
             else
             {
@@ -82,7 +89,9 @@ namespace memoryGame
         }
     }
 
-    public class MemoryGame {
+    public class MemoryGame 
+    {
+        string[][] hiddenWords;
         private int chances;
         public int moves { get; set; }
         private double completionTime;
@@ -121,7 +130,7 @@ namespace memoryGame
             int rand = 0;
             int doubledSize = size * 2;
             string[] randWords = { "" };
-            //TODO use SET collection
+            //TODO use collections + SET
             string[] matchingWords = new string[doubledSize];
             Array.Resize(ref randWords, size);
             Random random = new Random();
@@ -206,34 +215,26 @@ namespace memoryGame
             }
             Console.WriteLine();
         }
-        public void checkForMatch() 
-        { 
-
-        }
-        public virtual void selectCoord(out int row, out int column) {
-            row = 0;
-            column = 0;
-        }
-        public virtual void Run() { }
-        public virtual void drawBoard() { }
-    }
-    public class MemoryGameEasy : MemoryGame
-    {
-        string[][] hiddenWords = new string[2][] {new string[4], new string[4] };
-        public override void selectCoord(out int row, out int column)
-        {
+        public void selectCoord(out int row, out int column) {
             string firstPick = "";
             int secondPick = 0;
             Console.WriteLine("Please enter the coordinates of the word you want to uncover (example: A1)");
 
-            while (true) 
+            while (true)
             {
                 Console.Write("Row: ");
                 firstPick = Console.ReadLine();
-                row = firstPick[0] - 'A';
-                if (row >= 0 && row < hiddenWords.Length) {
-                    break;
+                if (firstPick == "A" || firstPick == "B" || firstPick == "C" || firstPick == "D") 
+                {
+                    row = firstPick[0] - 'A';
+                    if (row >= 0 && row < hiddenWords.Length)
+                    {
+                        break;
+                    }
+
+                //TODO better solution?
                 }
+                
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
             }
 
@@ -244,18 +245,47 @@ namespace memoryGame
                 {
                     Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
                 }
-                if (secondPick > 0 && secondPick < 5) {
+                if (secondPick > 0 && secondPick < 5)
+                {
                     column = --secondPick;
                     break;
                 }
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
             }
         }
-        public override void Run()
+        public void drawBoard()
         {
-            setChances(10);
-            setSize(4);
-            setDifficulty("easy");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("—-----------------------------------");
+            Console.WriteLine("\t Level: " + getDifficulty());
+            Console.WriteLine("\t Guess chances: " + getChances());
+            Console.WriteLine();
+
+            Console.WriteLine("\t   1  2  3  4");
+            char rowName = 'A';
+            foreach (string[] row in hiddenWords)
+            {
+                Console.Write("\t" + rowName++ + " ");
+                foreach (var word in row)
+                {
+                    Console.Write(word + " ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+            Console.WriteLine("—-----------------------------------");
+        }
+        public void Run() {
+            if (difficulty == "easy")
+            {
+                hiddenWords = new string[2][] { new string[4], new string[4] };
+            }
+            else {
+                hiddenWords = new string[4][] { new string[4], new string[4], new string[4], new string[4] };
+            }
+            //TODO better solution for matrix size
+
             DateTime t0 = DateTime.Now;
             gameWords = selectRandomWords();
 
@@ -272,9 +302,9 @@ namespace memoryGame
             {
                 for (int j = 0; j < hiddenWords[i].Length; j++)
                 {
-                    hiddenWords[i][j] = "X";
+                    hiddenWords[i][j] = " X";
                 }
-                
+
             }
 
             /*
@@ -292,7 +322,7 @@ namespace memoryGame
                     drawBoard();
 
                     selectCoord(out currentRow, out currentColumn);
-                    if (hiddenWords[currentRow][currentColumn] == "X")
+                    if (hiddenWords[currentRow][currentColumn] == " X")
                     {
                         hiddenWords[currentRow][currentColumn] = gameWords[currentRow * hiddenWords[0].Length + currentColumn];
                         checking = true;
@@ -342,183 +372,5 @@ namespace memoryGame
 
             }
         }
-        public override void drawBoard()
-        {   
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine("—-----------------------------------");
-            Console.WriteLine("\t Level: " + getDifficulty());
-            Console.WriteLine("\t Guess chances: " + getChances());
-            Console.WriteLine();
-
-            Console.WriteLine("\t   1  2  3  4");
-            char rowName = 'A';
-            foreach (string[] row in hiddenWords) {
-                Console.Write(rowName++ + " ");
-                foreach (var word in row) {
-                    Console.Write(word + " ");
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-            Console.WriteLine("—-----------------------------------");
-        }
-
-
     }
-    public class MemoryGameHard : MemoryGame {
-        string[] hiddenWords = new string[16];
-        public override void selectCoord(out int row, out int column)
-        {
-            row = 0;
-            column = 0;
-            string firstPick = "";
-            int secondPick = 0;
-            Console.WriteLine("Please enter the coordinates of the word you want to uncover (example: A1)");
-            Console.WriteLine("Row: ");
-            firstPick = Console.ReadLine();
-            if (firstPick == "A")
-            {
-                secondPick -= 1;
-            }
-            else if (firstPick == "B")
-            {
-                secondPick += 3;
-            }
-            else if (firstPick == "C")
-            {
-                secondPick += 7;
-            }
-            else if (firstPick == "D")
-            {
-                secondPick += 11;
-            }
-            else
-            {
-                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                //secondPick = selectCoord();
-                //return secondPick;
-            }
-            Console.WriteLine("Column: ");
-            String selectedString = Console.ReadLine();
-
-            try
-            {
-                secondPick += Convert.ToInt32(selectedString);
-            }
-            catch
-            {
-                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                //secondPick = selectCoord();
-                //return secondPick;
-            }
-
-            //return secondPick;
-        }
-        public override void Run() 
-        {
-            DateTime t0 = DateTime.Now;
-            setChances(15);
-            setSize(8);
-            setDifficulty("hard");
-            gameWords = selectRandomWords();
-            char hideSign = 'X';
-
-            int currentPick = 0;
-            int previousPick = 0;
-
-            Boolean flag = false;
-            Boolean checking = false;
-
-            for (int i = 0; i < hiddenWords.Length; i++)
-            {
-                hiddenWords[i] = hideSign.ToString();
-            }
-
-            /*
-            foreach (string word in gameWords) { 
-                Console.WriteLine(word);
-            }
-            */
-            //Console.WriteLine();
-
-            while (getRunning()) {
-                while (getChances() > 0)
-                {
-                    drawBoard();
-
-                    //currentPick = selectCoord();
-                    if(hiddenWords[currentPick] == "X"){
-                        hiddenWords[currentPick] = gameWords[currentPick];
-                        checking = true;
-                        while (flag == true)
-                        {
-                            if (hiddenWords[currentPick] == hiddenWords[previousPick])
-                            {
-                                Console.Clear();
-                                drawBoard();
-                                Console.WriteLine("It's a match! Keep going");
-                                flag = false;
-                                checking = false;
-                                Console.ReadLine();
-                                setSize(getSize() - 1);
-                                //setMoves(getMoves() + 1);
-                            }
-                            else
-                            {
-                                Console.Clear();
-                                drawBoard();
-                                Console.WriteLine("Your guess was wrong, try again");
-                                flag = false;
-                                checking = false;
-                                hiddenWords[currentPick] = hideSign.ToString();
-                                hiddenWords[previousPick] = hideSign.ToString();
-                                Console.ReadLine();
-                                setChances(getChances() - 1);
-                                //setMoves(getMoves() + 1);
-                            }
-                        }
-                        Console.Clear();
-                        previousPick = currentPick;
-
-                        if (checking == true)
-                        {
-                            flag = true;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("This word was already selected! Press again to continue");
-                        Console.ReadLine();
-                        Console.Clear();
-                    }
-                    DateTime t1 = DateTime.Now;
-                    TimeSpan ts = (t1 - t0);
-                    setCompletionTime(ts.TotalSeconds);
-                    checkWin();
-                    
-                }
-                checkLose();
-
-            }
-        }
-        public override void drawBoard() {
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine("—-----------------------------------");
-            Console.WriteLine("\t Level: " + getDifficulty());
-            Console.WriteLine("\t Guess chances: " + getChances());
-            Console.WriteLine();
-
-            Console.WriteLine("\t   1  2  3  4");
-            Console.WriteLine("\tA  {0}  {1}  {2}  {3}", hiddenWords[0], hiddenWords[1], hiddenWords[2], hiddenWords[3]);
-            Console.WriteLine("\tB  {0}  {1}  {2}  {3}", hiddenWords[4], hiddenWords[5], hiddenWords[6], hiddenWords[7]);
-            Console.WriteLine("\tC  {0}  {1}  {2}  {3}", hiddenWords[8], hiddenWords[9], hiddenWords[10], hiddenWords[11]);
-            Console.WriteLine("\tD  {0}  {1}  {2}  {3}", hiddenWords[12], hiddenWords[13], hiddenWords[14], hiddenWords[15]);
-
-            Console.WriteLine();
-            Console.WriteLine("—-----------------------------------");
-        }
-    }
-    
 }
