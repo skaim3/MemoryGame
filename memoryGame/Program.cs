@@ -223,7 +223,7 @@ namespace memoryGame
             while (true)
             {
                 Console.Write("Row: ");
-                firstPick = Console.ReadLine();
+                firstPick = Console.ReadLine().ToUpper();
                 if (firstPick == "A" || firstPick == "B" || firstPick == "C" || firstPick == "D") 
                 {
                     row = firstPick[0] - 'A';
@@ -244,6 +244,7 @@ namespace memoryGame
                 while (!int.TryParse(Console.ReadLine(), out secondPick))
                 {
                     Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
+                    Console.Write("Column: ");
                 }
                 if (secondPick > 0 && secondPick < 5)
                 {
@@ -262,7 +263,7 @@ namespace memoryGame
             Console.WriteLine("\t Guess chances: " + getChances());
             Console.WriteLine();
 
-            Console.WriteLine("\t   1  2  3  4");
+            Console.WriteLine("\t  1 2 3 4");
             char rowName = 'A';
             foreach (string[] row in hiddenWords)
             {
@@ -341,8 +342,8 @@ namespace memoryGame
                             else
                             {
                                 Console.WriteLine("Your guess was wrong, try again");
-                                hiddenWords[currentRow][currentColumn] = "X";
-                                hiddenWords[previousRow][previousColumn] = "X";
+                                hiddenWords[currentRow][currentColumn] = " X";
+                                hiddenWords[previousRow][previousColumn] = " X";
                                 Console.ReadLine();
                                 setChances(getChances() - 1);
                             }
