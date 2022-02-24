@@ -239,7 +239,8 @@ namespace memoryGame
             else
             {
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                selectCoord();
+                secondPick = selectCoord();
+                return secondPick;
             }
             if (firstPick == "A")
             {
@@ -252,7 +253,8 @@ namespace memoryGame
             else
             {
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                selectCoord();
+                secondPick = selectCoord();
+                return secondPick;
             }
 
             return secondPick;
@@ -369,11 +371,27 @@ namespace memoryGame
         string[] hiddenWords = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
         public override int selectCoord()
         {
+            string firstPick = "";
+            int secondPick = 0;
             Console.WriteLine("Please enter the coordinates of the word you want to uncover (example: A1)");
             Console.WriteLine("Row: ");
-            string firstPick = Console.ReadLine();
+            firstPick = Console.ReadLine();
             Console.WriteLine("Column: ");
-            int secondPick = int.Parse(Console.ReadLine());
+
+            String selectedString = Console.ReadLine();
+            Console.WriteLine(selectedString);
+
+            selectedString = selectedString.Replace("\n", "").Replace("\r", "");
+            if (selectedString != "")
+            {
+                secondPick = int.Parse(selectedString);
+            }
+            else
+            {
+                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
+                secondPick = selectCoord();
+                return secondPick;
+            }
             if (firstPick == "A")
             {
                 secondPick -= 1;
@@ -393,8 +411,8 @@ namespace memoryGame
             else 
             {
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                secondPick = 0;
-                selectCoord();
+                secondPick = selectCoord();
+                return secondPick;
             }
             return secondPick;
         }
