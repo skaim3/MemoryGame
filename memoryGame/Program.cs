@@ -8,12 +8,16 @@ namespace memoryGame
         static void Main(string[] args)
         {
             Menu menu= new Menu();
-            menu.Run();
+            while (menu.keepPlaying) {
+                menu.Run();
+                menu.checkRestart();
+            }
         }
 
     }
     public class Menu {
         private Boolean selectedDiff = false;
+        public Boolean keepPlaying { get; private set; } = true;
         //private String difficulty = "";
 
         public Boolean getSelectedDiff() { return selectedDiff; }
@@ -26,7 +30,6 @@ namespace memoryGame
             {
                 selectDifficulty();
             }
-            checkRestart();
         }
         public void checkRestart() 
         {
@@ -38,10 +41,10 @@ namespace memoryGame
             {
                 Console.Clear();
                 setSelectedDiff(false);
-                Run();
             }
             else if (selection == "no" || selection == "n")
             {
+                keepPlaying = false;
                 Console.WriteLine("Ending application");
                 Environment.Exit(0);
             }
@@ -87,7 +90,7 @@ namespace memoryGame
         private String difficulty;
         private String userName;
         private string[] words = File.ReadAllLines(@"..\..\..\resources\Words.txt");
-        public string[] scoreboard;
+        public string[] scoreboard = File.ReadAllLines(@"..\..\..\resources\Scoreboard.txt");
         public string[] gameWords;
         private Boolean running = true;
 
@@ -190,7 +193,6 @@ namespace memoryGame
         }
         public void showScoreboard() {
             String path = @"..\..\..\resources\Scoreboard.txt";
-            scoreboard = File.ReadAllLines(path);
             Console.WriteLine();
             Console.WriteLine("\t=========   BEST SCORES   =========");
 
@@ -218,7 +220,7 @@ namespace memoryGame
     }
     public class MemoryGameEasy : MemoryGame
     {
-        string[] hiddenWords = { "", "", "", "", "", "", "", "" };
+        string[] hiddenWords = new string[8];
         public override int selectCoord()
         {
             string firstPick = "";
@@ -226,22 +228,7 @@ namespace memoryGame
             Console.WriteLine("Please enter the coordinates of the word you want to uncover (example: A1)");
             Console.WriteLine("Row: ");
             firstPick = Console.ReadLine();
-            Console.WriteLine("Column: ");
 
-            String selectedString = Console.ReadLine();
-            Console.WriteLine(selectedString);
-
-            selectedString = selectedString.Replace("\n", "").Replace("\r", "");
-            if (selectedString != "")
-            {
-                secondPick = int.Parse(selectedString);
-            }
-            else
-            {
-                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                secondPick = selectCoord();
-                return secondPick;
-            }
             if (firstPick == "A")
             {
                 secondPick -= 1;
@@ -257,6 +244,18 @@ namespace memoryGame
                 return secondPick;
             }
 
+            Console.WriteLine("Column: ");
+            String selectedString = Console.ReadLine();
+            try 
+            {
+                secondPick += Convert.ToInt32(selectedString);
+            }
+            catch 
+            {
+                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
+                secondPick = selectCoord();
+                return secondPick;
+            }
             return secondPick;
         }
         public override void Run()
@@ -368,7 +367,7 @@ namespace memoryGame
 
     }
     public class MemoryGameHard : MemoryGame {
-        string[] hiddenWords = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+        string[] hiddenWords = new string[16];
         public override int selectCoord()
         {
             string firstPick = "";
@@ -376,22 +375,6 @@ namespace memoryGame
             Console.WriteLine("Please enter the coordinates of the word you want to uncover (example: A1)");
             Console.WriteLine("Row: ");
             firstPick = Console.ReadLine();
-            Console.WriteLine("Column: ");
-
-            String selectedString = Console.ReadLine();
-            Console.WriteLine(selectedString);
-
-            selectedString = selectedString.Replace("\n", "").Replace("\r", "");
-            if (selectedString != "")
-            {
-                secondPick = int.Parse(selectedString);
-            }
-            else
-            {
-                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
-                secondPick = selectCoord();
-                return secondPick;
-            }
             if (firstPick == "A")
             {
                 secondPick -= 1;
@@ -408,12 +391,26 @@ namespace memoryGame
             {
                 secondPick += 11;
             }
-            else 
+            else
             {
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
                 secondPick = selectCoord();
                 return secondPick;
             }
+            Console.WriteLine("Column: ");
+            String selectedString = Console.ReadLine();
+
+            try
+            {
+                secondPick += Convert.ToInt32(selectedString);
+            }
+            catch
+            {
+                Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
+                secondPick = selectCoord();
+                return secondPick;
+            }
+
             return secondPick;
         }
         public override void Run() 
