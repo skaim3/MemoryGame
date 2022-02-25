@@ -316,12 +316,12 @@ namespace memoryGame
 
             }
 
-            
+            /*
             foreach (string word in gameWords)
             {
                 Console.WriteLine(word);
             }
-            
+            */
             //Console.WriteLine();
 
             while (getRunning())
