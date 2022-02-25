@@ -91,7 +91,7 @@ namespace memoryGame
 
     public class MemoryGame 
     {
-        string[][] hiddenWords;
+        string[][] board;
         private int chances;
         public int moves { get; set; }
         private double completionTime;
@@ -99,7 +99,7 @@ namespace memoryGame
         private String difficulty;
         private String userName;
         private string[] words = File.ReadAllLines(@"..\..\..\resources\Words.txt");
-        public string[] scoreboard = File.ReadAllLines(@"..\..\..\resources\Scoreboard.txt");
+        public string[] scoreboard;
         public string[] gameWords;
         private Boolean running = true;
 
@@ -166,7 +166,7 @@ namespace memoryGame
                 Console.WriteLine("    You matched all the pairs!");
                 Console.WriteLine("    You solved the game after " + moves + " moves. It took you " + getCompletionTime() + " seconds");
                 setChances(-1);
-                showScoreboard();
+                loadScoreboard();
                 saveScore();
                 setRunning(false);
             }
@@ -178,7 +178,7 @@ namespace memoryGame
                 Console.Clear();
                 Console.WriteLine("\t=========   GAME OVER   =========\t");
                 Console.WriteLine("    You have run out of chances!");
-                showScoreboard();
+                loadScoreboard();
                 setRunning(false);
             }
         }
@@ -198,8 +198,12 @@ namespace memoryGame
                 
             }
         }
-        public void showScoreboard() {
+        public void loadScoreboard() {
             String path = @"..\..\..\resources\Scoreboard.txt";
+            if (!File.Exists(path))
+            {
+                using (StreamWriter sw = File.CreateText(path)){}
+            }
             Console.WriteLine();
             Console.WriteLine("\t=========   BEST SCORES   =========");
 
@@ -227,12 +231,12 @@ namespace memoryGame
                 if (firstPick == "A" || firstPick == "B" || firstPick == "C" || firstPick == "D") 
                 {
                     row = firstPick[0] - 'A';
-                    if (row >= 0 && row < hiddenWords.Length)
+                    if (row >= 0 && row < board.Length)
                     {
                         break;
                     }
 
-                //TODO better solution?
+                //TODO better solution for first pick?
                 }
                 
                 Console.WriteLine("\nThe selected value does not exists or is not allowed! Please select the correct coordinate\n");
@@ -263,9 +267,9 @@ namespace memoryGame
             Console.WriteLine("\t Guess chances: " + getChances());
             Console.WriteLine();
 
-            Console.WriteLine("\t  1 2 3 4");
+            Console.WriteLine("\t   1  2  3  4");
             char rowName = 'A';
-            foreach (string[] row in hiddenWords)
+            foreach (string[] row in board)
             {
                 Console.Write("\t" + rowName++ + " ");
                 foreach (var word in row)
@@ -278,14 +282,18 @@ namespace memoryGame
             Console.WriteLine("—-----------------------------------");
         }
         public void Run() {
-            if (difficulty == "easy")
+            board = new string[size / 2][];
+            for (int i = 0; i < size / 2; ++i)
             {
-                hiddenWords = new string[2][] { new string[4], new string[4] };
+                if (difficulty == "easy")
+                {
+                    board[i] = new string[size];
+                }
+                else { 
+                    board[i] = new string[size/2];
+                }      
             }
-            else {
-                hiddenWords = new string[4][] { new string[4], new string[4], new string[4], new string[4] };
-            }
-            //TODO better solution for matrix size
+            //TODO better solution for board size
 
             DateTime t0 = DateTime.Now;
             gameWords = selectRandomWords();
@@ -299,21 +307,21 @@ namespace memoryGame
             Boolean flag = false;
             Boolean checking = false;
 
-            for (int i = 0; i < hiddenWords.Length; i++)
+            for (int i = 0; i < board.Length; i++)
             {
-                for (int j = 0; j < hiddenWords[i].Length; j++)
+                for (int j = 0; j < board[i].Length; j++)
                 {
-                    hiddenWords[i][j] = " X";
+                    board[i][j] = " X";
                 }
 
             }
 
-            /*
+            
             foreach (string word in gameWords)
             {
                 Console.WriteLine(word);
             }
-            */
+            
             //Console.WriteLine();
 
             while (getRunning())
@@ -323,9 +331,9 @@ namespace memoryGame
                     drawBoard();
 
                     selectCoord(out currentRow, out currentColumn);
-                    if (hiddenWords[currentRow][currentColumn] == " X")
+                    if (board[currentRow][currentColumn] == " X")
                     {
-                        hiddenWords[currentRow][currentColumn] = gameWords[currentRow * hiddenWords[0].Length + currentColumn];
+                        board[currentRow][currentColumn] = gameWords[currentRow * board[0].Length + currentColumn];
                         checking = true;
                         while (flag == true)
                         {
@@ -333,7 +341,7 @@ namespace memoryGame
                             drawBoard();
                             flag = false;
                             checking = false;
-                            if (hiddenWords[currentRow][currentColumn] == hiddenWords[previousRow][previousColumn])
+                            if (board[currentRow][currentColumn] == board[previousRow][previousColumn])
                             {
                                 Console.WriteLine("It's a match! Keep going");
                                 Console.ReadLine();
@@ -342,8 +350,8 @@ namespace memoryGame
                             else
                             {
                                 Console.WriteLine("Your guess was wrong, try again");
-                                hiddenWords[currentRow][currentColumn] = " X";
-                                hiddenWords[previousRow][previousColumn] = " X";
+                                board[currentRow][currentColumn] = " X";
+                                board[previousRow][previousColumn] = " X";
                                 Console.ReadLine();
                                 setChances(getChances() - 1);
                             }
